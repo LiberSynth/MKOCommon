@@ -171,7 +171,7 @@ begin
             (SR.Name <> '.') and
             CheckMasks(SR.Name)
 
-        then _Handler(Path + SR.Name)
+        then _Handler(Format('%s\%s', [Path, SR.Name]))
 
       until FindNext(SR) <> 0;
 
