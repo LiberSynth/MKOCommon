@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{AF4E8686-2645-4D13-B47A-6612253CE57F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\..\MKOTaskManager\Sources\MKOTaskManager.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\MKOFileResearch\Sources\MKOFileResearch.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="MKOTaskManager">
+        <MSBuild Projects="..\..\MKOTaskManager\Sources\MKOTaskManager.dproj"/>
+    </Target>
+    <Target Name="MKOTaskManager:Clean">
+        <MSBuild Projects="..\..\MKOTaskManager\Sources\MKOTaskManager.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MKOTaskManager:Make">
+        <MSBuild Projects="..\..\MKOTaskManager\Sources\MKOTaskManager.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MKOFileResearch">
+        <MSBuild Projects="..\..\MKOFileResearch\Sources\MKOFileResearch.dproj"/>
+    </Target>
+    <Target Name="MKOFileResearch:Clean">
+        <MSBuild Projects="..\..\MKOFileResearch\Sources\MKOFileResearch.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MKOFileResearch:Make">
+        <MSBuild Projects="..\..\MKOFileResearch\Sources\MKOFileResearch.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="MKOTaskManager;MKOFileResearch"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="MKOTaskManager:Clean;MKOFileResearch:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="MKOTaskManager:Make;MKOFileResearch:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
