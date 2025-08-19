@@ -102,6 +102,7 @@ object fmGetTextForm: TfmGetTextForm
         Height = 25
         Anchors = [akTop, akRight]
         Caption = #1054#1050
+        Default = True
         ModalResult = 1
         TabOrder = 0
       end

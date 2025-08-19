@@ -4,6 +4,14 @@ interface
 
 type
 
+  IMKOTaskInstance = interface
+
+    ['{BB1478EA-61D2-428B-ACF6-187DBA5430AA}']
+    procedure Execute; safecall;
+    procedure Terminate; safecall;
+
+  end;
+
   IMKOTask = interface
 
     ['{FD8BA618-01E2-4972-9BE7-BC4EA9E16AA5}']
@@ -12,9 +20,8 @@ type
     function GetCaption: WideString; safecall;
     function GetDescription: WideString; safecall;
     function GetParamsHelpText: WideString; safecall;
-    procedure ValidateParams(const _Params: WideString); safecall;
-    procedure Start(const _Params: WideString); safecall;
-    procedure Cancel; safecall;
+    procedure ValidateParams(var _Params: WideString); safecall;
+    function StartTask(const _Params: WideString): IMKOTaskInstance; safecall;
 
     property Name: WideString read GetName;
     property Caption: WideString read GetCaption;
