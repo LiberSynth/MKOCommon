@@ -4,10 +4,19 @@ interface
 
 type
 
+  IMKOTaskWiteOut = interface
+
+    ['{9E53166A-727B-4B11-B091-BDB4182AF34C}']
+
+    procedure WriteOut(const _Value: WideString); safecall;
+
+  end;
+
   IMKOTaskInstance = interface
 
     ['{BB1478EA-61D2-428B-ACF6-187DBA5430AA}']
-    procedure Execute; safecall;
+    {TODO 4 -oVasilevSM : ƒобавить в описание: этот метод запускаетс€ отдельным потоком, поэтому в его исполнении нужно обеспечивать междупоточную синхронизацию дл€ общих ресурсов. }
+    procedure Execute(_WriteOutIntf: IMKOTaskWiteOut); safecall;
     procedure Terminate; safecall;
 
   end;
