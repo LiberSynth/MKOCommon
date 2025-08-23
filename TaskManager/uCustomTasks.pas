@@ -19,10 +19,10 @@ type
     function GetCaption: WideString; virtual; safecall; abstract;
     function GetDescription: WideString; virtual; safecall; abstract;
     function GetParamsHelpText: WideString; virtual; safecall; abstract;
-    procedure ValidateParams(var _Params: WideString); overload; virtual; safecall;
-    function StartTask(const _Params: WideString): IMKOTaskInstance; overload; virtual; safecall;
+    function ValidateParams(const _Params: IMKOTaskParams): LongBool; overload; virtual; safecall;
+    function StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance; overload; virtual; safecall;
 
-    procedure ValidateParams(const _Params: TArray<String>); overload; virtual;
+    function ValidateParams(const _Params: TArray<String>): Boolean; overload; virtual;
     function StartTask(const _Params: TArray<String>): IMKOTaskInstance; overload; virtual; safecall; abstract;
 
   end;
@@ -31,17 +31,17 @@ implementation
 
 { TCustomMKOTask }
 
-procedure TCustomMKOTask.ValidateParams(var _Params: WideString);
+function TCustomMKOTask.ValidateParams(const _Params: IMKOTaskParams): LongBool;
 begin
-  ValidateParams(ParseParams(_Params));
+//  Result := ValidateParams(ParseParams(_Params.));
 end;
 
-function TCustomMKOTask.StartTask(const _Params: WideString): IMKOTaskInstance;
+function TCustomMKOTask.StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance;
 begin
-  Result := StartTask(ParseParams(_Params));
+//  Result := StartTask(ParseParams(_Params));
 end;
 
-procedure TCustomMKOTask.ValidateParams(const _Params: TArray<String>);
+function TCustomMKOTask.ValidateParams(const _Params: TArray<String>): Boolean;
 begin
 end;
 

@@ -26,12 +26,13 @@ type
   strict private
 
     function GetContext: String;
+    procedure SetContext(const _Value: String);
 
   private
 
     constructor Create(const _Caption, _Text: String); reintroduce;
 
-    property Context: String read GetContext;
+    property Context: String read GetContext write SetContext;
 
   end;
 
@@ -49,6 +50,7 @@ begin
   Form := TfmGetTextForm.Create(Caption, Text);
   try
 
+    Form.Context := Value;
     Result := Form.ShowModal = mrOk;
     if Result then
       Value := Form.Context;
@@ -101,6 +103,11 @@ end;
 function TfmGetTextForm.GetContext: String;
 begin
   Result := mParams.Lines.Text;
+end;
+
+procedure TfmGetTextForm.SetContext(const _Value: String);
+begin
+  mParams.Lines.Text := _Value;
 end;
 
 end.

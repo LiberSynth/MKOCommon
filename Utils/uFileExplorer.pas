@@ -8,7 +8,16 @@ uses
 
 type
 
-  TFileProc = reference to procedure(const FileName: String);
+  TFileProc = reference to procedure(const FileName: String; MaskMatches: Boolean; var Terminated: Boolean);
+
+procedure ExploreFiles(const Path, Masks: String; Recursive: Boolean; Handler: TFileProc); overload;
+procedure ExploreFiles(const Path, Masks: String; Handler: TFileProc); overload;
+procedure ExploreFiles(const Path: String; Recursive: Boolean; Handler: TFileProc); overload;
+procedure ExploreFiles(const Path: String; Handler: TFileProc); overload;
+
+implementation
+
+type
 
   TFileExplorer = class
 
@@ -16,11 +25,15 @@ type
 
     FPath: String;
     FMasks: String;
+    FRecursive: Boolean;
+    FTerminated: Boolean;
 
     function CheckMasks(const _Value: String): Boolean;
     function CheckMask(const _Value, _Mask: String): Boolean;
     function CheckSingleMask(const _Value, _Mask: String): Boolean;
     procedure RaiseInvalidMaskError(const _Mask: String);
+
+    property Terminated: Boolean read FTerminated;
 
   public
 
@@ -28,15 +41,11 @@ type
 
     property Path: String read FPath write FPath;
     property Masks: String read FMasks write FMasks;
+    property Recursive: Boolean read FRecursive write FRecursive;
 
   end;
 
-procedure ExploreFiles(const Path, Masks: String; Handler: TFileProc); overload;
-procedure ExploreFiles(const Path: String; Handler: TFileProc); overload;
-
-implementation
-
-procedure ExploreFiles(const Path, Masks: String; Handler: TFileProc);
+procedure ExploreFiles(const Path, Masks: String; Recursive: Boolean; Handler: TFileProc);
 var
   FileExplorer: TFileExplorer;
 begin
@@ -46,6 +55,7 @@ begin
 
     FileExplorer.Path := Path;
     FileExplorer.Masks := Masks;
+    FileExplorer.Recursive := Recursive;
     FileExplorer.Run(Handler);
 
   finally
@@ -54,9 +64,19 @@ begin
 
 end;
 
+procedure ExploreFiles(const Path, Masks: String; Handler: TFileProc);
+begin
+  ExploreFiles(Path, Masks, False, Handler);
+end;
+
+procedure ExploreFiles(const Path: String; Recursive: Boolean; Handler: TFileProc);
+begin
+  ExploreFiles(Path, Recursive, Handler);
+end;
+
 procedure ExploreFiles(const Path: String; Handler: TFileProc);
 begin
-  ExploreFiles(Path, '', Handler);
+  ExploreFiles(Path, '', False, Handler);
 end;
 
 { TFileExplorer }
@@ -157,6 +177,7 @@ end;
 procedure TFileExplorer.Run(_Handler: TFileProc);
 var
   SR: TSearchRec;
+  TempPath: String;
 begin
 
   if FindFirst(Path + '\*.*', faAnyFile, SR) = 0 then
@@ -168,12 +189,34 @@ begin
         if
 
             (SR.Name <> '..') and
-            (SR.Name <> '.') and
-            CheckMasks(SR.Name)
+            (SR.Name <> '.')
 
-        then _Handler(Format('%s\%s', [Path, SR.Name]))
+        then
 
-      until FindNext(SR) <> 0;
+          if SR.Attr and faDirectory <> 0 then
+          begin
+
+            if Recursive then
+            begin
+
+              TempPath := Path;
+              Path := Format('%s\%s', [Path, SR.Name]);
+              try
+
+                Run(_Handler);
+
+              finally
+                Path := TempPath;
+              end;
+
+            end;
+
+          end
+          else
+
+            _Handler(Format('%s\%s', [Path, SR.Name]), CheckMasks(SR.Name), FTerminated);
+
+      until Terminated or (FindNext(SR) <> 0);
 
     finally
       FindClose(SR);
