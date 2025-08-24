@@ -131,6 +131,7 @@ begin
   if not Initialized then
   begin
 
+    {TODO 2 -oVasilevSM : Здесь нужен парсер. И, создать архитектуру для масок, типизованный рекорд, где может быть одна часть и две итд. }
     SA := Masks.Split(['|']);
     L := Length(SA);
     SetLength(FMaskList, L);

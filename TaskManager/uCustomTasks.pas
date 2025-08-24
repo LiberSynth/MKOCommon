@@ -3,14 +3,12 @@ unit uCustomTasks;
 interface
 
 uses
-  { VCL }
-  System.SysUtils,
   { Common }
-  uInterfaces, Common.uUtils;
+  uInterfaces;
 
 type
 
-  TCustomMKOTask = class(TInterfacedObject, IMKOTask)
+  TCustomTask = class abstract (TInterfacedObject, IMKOTask)
 
   protected
 
@@ -19,30 +17,67 @@ type
     function GetCaption: WideString; virtual; safecall; abstract;
     function GetDescription: WideString; virtual; safecall; abstract;
     function GetParamsHelpText: WideString; virtual; safecall; abstract;
-    function ValidateParams(const _Params: IMKOTaskParams): LongBool; overload; virtual; safecall;
-    function StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance; overload; virtual; safecall;
+    function ValidateParams(const _Params: IMKOTaskParams): LongBool; virtual; safecall; abstract;
+    function StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance; virtual; safecall; abstract;
 
-    function ValidateParams(const _Params: TArray<String>): Boolean; overload; virtual;
-    function StartTask(const _Params: TArray<String>): IMKOTaskInstance; overload; virtual; safecall; abstract;
+  end;
+
+  TCustomMKOTaskInstance = class abstract (TInterfacedObject, IMKOTaskInstance)
+
+  strict private
+
+    FTerminated: Boolean;
+    FParams: IMKOTaskParams;
+    FOutputIntf: IMKOTaskOutput;
+
+  protected
+
+    { IMKOTaskInstance }
+    procedure Execute(const _OutputIntf: IMKOTaskOutput); virtual; safecall;
+    procedure Terminate; virtual; safecall;
+
+    procedure Init(const _OutputIntf: IMKOTaskOutput); virtual;
+    procedure WriteOut(const _Value: WideString; _Progress: ShortInt);
+
+    property Terminated: Boolean read FTerminated;
+    property Params: IMKOTaskParams read FParams;
+    property OutputIntf: IMKOTaskOutput read FOutputIntf;
+
+  public
+
+    constructor Create(const _Params: IMKOTaskParams);
 
   end;
 
 implementation
 
-{ TCustomMKOTask }
+{ TCustomMKOTaskInstance }
 
-function TCustomMKOTask.ValidateParams(const _Params: IMKOTaskParams): LongBool;
+constructor TCustomMKOTaskInstance.Create(const _Params: IMKOTaskParams);
 begin
-//  Result := ValidateParams(ParseParams(_Params.));
+  inherited Create;
+  FParams := _Params;
 end;
 
-function TCustomMKOTask.StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance;
+procedure TCustomMKOTaskInstance.Execute(const _OutputIntf: IMKOTaskOutput);
 begin
-//  Result := StartTask(ParseParams(_Params));
+  Init(_OutputIntf);
 end;
 
-function TCustomMKOTask.ValidateParams(const _Params: TArray<String>): Boolean;
+procedure TCustomMKOTaskInstance.Init(const _OutputIntf: IMKOTaskOutput);
 begin
+  FOutputIntf := _OutputIntf;
+end;
+
+procedure TCustomMKOTaskInstance.Terminate;
+begin
+  FTerminated := True;
+end;
+
+procedure TCustomMKOTaskInstance.WriteOut(const _Value: WideString; _Progress: ShortInt);
+begin
+  if not Terminated then
+    OutputIntf.WriteOut(_Value, _Progress);
 end;
 
 end.

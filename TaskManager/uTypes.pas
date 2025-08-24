@@ -4,13 +4,14 @@ interface
 
 uses
   { VCL }
-  System.SysUtils ;
+  System.SysUtils;
 
 type
 
   EMKOTMException = class(Exception);
+  EMKOLibException = class(Exception);
 
-  EMKOLibException = class(EMKOTMException);
+  TBLOB = RawByteString;  { RawByteString is too long to write everywhere. }
 
 implementation
 
