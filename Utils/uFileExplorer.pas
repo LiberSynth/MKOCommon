@@ -26,14 +26,20 @@ type
     FPath: String;
     FMasks: String;
     FRecursive: Boolean;
+    FInitialized: Boolean;
     FTerminated: Boolean;
+    FMaskList: TArray<TArray<String>>;
+
+    procedure Init;
 
     function CheckMasks(const _Value: String): Boolean;
-    function CheckMask(const _Value, _Mask: String): Boolean;
+    function CheckMask(const _Value: String; const _Mask: TArray<String>): Boolean;
     function CheckSingleMask(const _Value, _Mask: String): Boolean;
     procedure RaiseInvalidMaskError(const _Mask: String);
 
     property Terminated: Boolean read FTerminated;
+    property Initialized: Boolean read FInitialized;
+    property MaskList: TArray<TArray<String>> read FMaskList;
 
   public
 
@@ -116,21 +122,44 @@ begin
 
 end;
 
-function TFileExplorer.CheckMask(const _Value, _Mask: String): Boolean;
+procedure TFileExplorer.Init;
 var
   SA: TArray<String>;
+  i, L: Integer;
+begin
+
+  if not Initialized then
+  begin
+
+    SA := Masks.Split(['|']);
+    L := Length(SA);
+    SetLength(FMaskList, L);
+
+    for i := 0 to L - 1 do
+    begin
+
+      MaskList[i] := SA[i].Split(['.']);
+
+      if Length(MaskList[i]) <> 2 then
+        RaiseInvalidMaskError(SA[i]);
+
+    end;
+
+    FInitialized := True;
+
+  end;
+
+end;
+
+function TFileExplorer.CheckMask(const _Value: String; const _Mask: TArray<String>): Boolean;
+var
   NameMask, ExtMask: String;
   PointPos: Integer;
   FileName, FileExt: String;
 begin
 
-  SA := _Mask.Split(['.']);
-
-  if Length(SA) <> 2 then
-    RaiseInvalidMaskError(_Mask);
-
-  NameMask := SA[0];
-  ExtMask := SA[1];
+  NameMask := _Mask[0];
+  ExtMask := _Mask[1];
 
   PointPos := _Value.LastIndexOf('.');
 
@@ -159,15 +188,13 @@ end;
 function TFileExplorer.CheckMasks(const _Value: String): Boolean;
 var
   SA: TArray<String>;
-  S: String;
 begin
 
-  if Length(Masks) = 0 then
+  if Length(MaskList) = 0 then
     Exit(True);
 
-  SA := Masks.Split(['|']);
-  for S in SA do
-    if CheckMask(_Value, S) then
+  for SA in MaskList do
+    if CheckMask(_Value, SA) then
       Exit(True);
 
   Result := False;
@@ -179,6 +206,8 @@ var
   SR: TSearchRec;
   TempPath: String;
 begin
+
+  Init;
 
   if FindFirst(Path + '\*.*', faAnyFile, SR) = 0 then
 
