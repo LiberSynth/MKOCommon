@@ -1,4 +1,4 @@
-unit uGetTextForm;
+unit Common.uGetTextForm;
 
 interface
 

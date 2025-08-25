@@ -1,4 +1,4 @@
-unit uTypes;
+unit Common.uTypes;
 
 interface
 
@@ -11,7 +11,7 @@ type
   EMKOTMException = class(Exception);
   EMKOLibException = class(Exception);
 
-  TBLOB = RawByteString;  { RawByteString is too long to write everywhere. }
+  TBlob = RawByteString;  { RawByteString is too long to write everywhere. }
 
 implementation
 
