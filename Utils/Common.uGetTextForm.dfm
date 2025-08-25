@@ -58,7 +58,7 @@ object fmGetTextForm: TfmGetTextForm
         AlignWithMargins = True
         Left = 4
         Top = 10
-        Width = 456
+        Width = 66
         Height = 15
         Margins.Left = 4
         Margins.Top = 10
@@ -68,7 +68,6 @@ object fmGetTextForm: TfmGetTextForm
         Alignment = taCenter
         Caption = 'Create: _Text'
         WordWrap = True
-        ExplicitWidth = 66
       end
       object mParams: TMemo
         AlignWithMargins = True

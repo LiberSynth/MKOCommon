@@ -36,6 +36,7 @@ type
 
   end;
 
+{TODO 5 -oVasilevSM : Фреймворк может работать для консольных приложений и служб. }
 function InputText(const Caption, Text: String; var Value: String): Boolean;
 
 implementation

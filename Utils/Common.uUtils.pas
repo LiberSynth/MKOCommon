@@ -10,6 +10,7 @@ uses
 
 function CutStr(var Value: String; CutCount: Integer): Boolean; inline; overload;
 function CutStr(var Value: WideString; CutCount: Integer): Boolean; inline; overload;
+function ExeDir: String;
 
 implementation
 
@@ -58,6 +59,11 @@ begin
   for i := Low(Result) to High(Result) do
     Result[i] := Result[i].Trim;
 
+end;
+
+function ExeDir: String;
+begin
+  Result := ExtractFileDir(ParamStr(0));
 end;
 
 end.
