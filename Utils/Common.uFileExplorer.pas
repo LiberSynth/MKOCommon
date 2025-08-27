@@ -230,9 +230,9 @@ begin
             begin
 
               TempPath := Path;
-              Path := Format('%s\%s', [Path, SR.Name]);
               try
 
+                Path := Format('%s\%s', [Path, SR.Name]);
                 Run(_Handler);
 
               finally

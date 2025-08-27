@@ -9,6 +9,9 @@
         <Projects Include="..\..\MKOFileResearch\Sources\MKOFileResearch.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\MKOShellRunner\Sources\MKOShellRunner.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="MKOFileResearch:Make">
         <MSBuild Projects="..\..\MKOFileResearch\Sources\MKOFileResearch.dproj" Targets="Make"/>
     </Target>
+    <Target Name="MKOShellRunner">
+        <MSBuild Projects="..\..\MKOShellRunner\Sources\MKOShellRunner.dproj"/>
+    </Target>
+    <Target Name="MKOShellRunner:Clean">
+        <MSBuild Projects="..\..\MKOShellRunner\Sources\MKOShellRunner.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MKOShellRunner:Make">
+        <MSBuild Projects="..\..\MKOShellRunner\Sources\MKOShellRunner.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="MKOTaskManager;MKOFileResearch"/>
+        <CallTarget Targets="MKOTaskManager;MKOFileResearch;MKOShellRunner"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="MKOTaskManager:Clean;MKOFileResearch:Clean"/>
+        <CallTarget Targets="MKOTaskManager:Clean;MKOFileResearch:Clean;MKOShellRunner:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="MKOTaskManager:Make;MKOFileResearch:Make"/>
+        <CallTarget Targets="MKOTaskManager:Make;MKOFileResearch:Make;MKOShellRunner:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
