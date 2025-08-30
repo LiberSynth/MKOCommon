@@ -109,6 +109,7 @@ end;
 procedure TfmGetTextForm.SetContext(const _Value: String);
 begin
   mParams.Lines.Text := _Value;
+  mParams.SelStart := Length(_Value);
 end;
 
 end.

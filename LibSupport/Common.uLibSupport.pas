@@ -10,6 +10,8 @@ uses
   Common.uConsts, Common.uTypes, Common.uUtils, Common.uInterfaces, Common.uFileExplorer,
   Common.uFileUtils, Common.uTaskThread;
 
+{TODO 1 -oVasilevSM : Разделить в интерфейсе WriteOut и Progress. }
+
 type
 
   TTaskState = (tsCreated, tsWaiting, tsProcessing, tsFinished, tsCanceled, tsError);
@@ -44,7 +46,8 @@ type
       FTaskItem: TMKOTaskItem;
 
       { IMKOTaskOutput }
-      procedure WriteOut(const _Value: WideString; _Progress: Integer); safecall;
+      procedure WriteOut(const _Value: WideString; _SeparateLine: LongBool); safecall;
+      procedure Progress(_Value: Integer); safecall;
 
       property TaskItem: TMKOTaskItem read FTaskItem;
 
@@ -112,7 +115,8 @@ type
     procedure CompleteTaskProcessing;
 
     { Многопоточный метод }
-    procedure WriteOut(const _Value: WideString; _Progress: Integer; _Assured: Boolean = False);
+    procedure WriteOut(const _Value: WideString; _SeparateLine: Boolean; _Assured: Boolean = False);
+    procedure Progress(_Value: Integer);
 
   public
 
@@ -370,9 +374,14 @@ begin
   FTaskItem := _Item;
 end;
 
-procedure TMKOTaskItem.TOutputIntf.WriteOut(const _Value: WideString; _Progress: Integer);
+procedure TMKOTaskItem.TOutputIntf.Progress(_Value: Integer);
 begin
-  TaskItem.WriteOut(_Value, _Progress);
+  TaskItem.Progress(_Value);
+end;
+
+procedure TMKOTaskItem.TOutputIntf.WriteOut(const _Value: WideString; _SeparateLine: LongBool);
+begin
+  TaskItem.WriteOut(_Value, _SeparateLine);
 end;
 
 { TMKOTaskItem }
@@ -391,7 +400,7 @@ begin
 
       TimeToStr(CompletePoint - CreatePoint)
 
-  ]), -1, True);
+  ]), True, True);
 
   SaveToLog;
 
@@ -494,6 +503,26 @@ begin
 
 end;
 
+procedure TMKOTaskItem.Progress(_Value: Integer);
+begin
+
+  ProgressLocker.Acquire;
+  try
+
+    if FProgress <> _Value then
+    begin
+
+      FProgress := _Value;
+      DoSendProgress;
+
+    end;
+
+  finally
+    ProgressLocker.Release;
+  end;
+
+end;
+
 procedure TMKOTaskItem.PullData(var _Target: String);
 begin
 
@@ -572,7 +601,7 @@ begin
     StateLocker.Release;
   end;
 
-  WriteOut(State.Report, -1);
+  WriteOut(State.Report, True, True);
   DoChanged;
 
 end;
@@ -613,7 +642,9 @@ begin
   State := tsCanceled;
 end;
 
-procedure TMKOTaskItem.WriteOut(const _Value: WideString; _Progress: Integer; _Assured: Boolean);
+procedure TMKOTaskItem.WriteOut(const _Value: WideString; _SeparateLine: Boolean; _Assured: Boolean);
+var
+  LineSepartor: String;
 begin
 
   DataLocker.Acquire;
@@ -622,30 +653,22 @@ begin
     if Length(_Value) > 0 then
     begin
 
-      {TODO 1 -oVasilevSM : Тут очень долго. }
-      FData := _Value + CRLF + FData;
+      if _SeparateLine and (Length(FData) > 0) then LineSepartor := CRLF
+      else LineSepartor := '';
+
+      if Task.Intf.DirectOutput then
+        FData := FData + LineSepartor + _Value
+      else
+        FData := _Value + LineSepartor + FData;
+
       FDataChanged := True;
+      {TODO 1 -oVasilevSM : Тут очень долго. }
       DoSendData(_Assured);
 
     end;
 
   finally
     DataLocker.Release;
-  end;
-
-  ProgressLocker.Acquire;
-  try
-
-    if (_Progress <> -1) and (FProgress <> _Progress) then
-    begin
-
-      FProgress := _Progress;
-      DoSendProgress;
-
-    end;
-
-  finally
-    ProgressLocker.Release;
   end;
 
 end;

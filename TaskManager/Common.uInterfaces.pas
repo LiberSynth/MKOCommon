@@ -4,11 +4,13 @@ interface
 
 type
 
+  {TODO 3 -oVasilevSM : ѕроверить все safecall методы на топустимые типы данных. }
   IMKOTaskOutput = interface
 
     ['{9E53166A-727B-4B11-B091-BDB4182AF34C}']
 
-    procedure WriteOut(const _Value: WideString; _Progress: Integer); safecall;
+    procedure WriteOut(const _Value: WideString; _SeparateLine: LongBool); safecall;
+    procedure Progress(_Value: Integer); safecall;
 
   end;
 
@@ -47,6 +49,7 @@ type
     function GetCaption: WideString; safecall;
     function GetDescription: WideString; safecall;
     function GetParamsHelpText: WideString; safecall;
+    function GetDirectOutput: LongBool; safecall;
     function ValidateParams(const _Params: IMKOTaskParams): LongBool; safecall;
     function StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance; safecall;
 
@@ -54,6 +57,7 @@ type
     property Caption: WideString read GetCaption;
     property Description: WideString read GetDescription;
     property ParamsHelpText: WideString read GetParamsHelpText;
+    property DirectOutput: LongBool read GetDirectOutput;
 
   end;
 

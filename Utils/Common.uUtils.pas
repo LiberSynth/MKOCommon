@@ -4,13 +4,14 @@ interface
 
 uses
   { VCL }
-  System.SysUtils,
+  System.SysUtils, Winapi.Windows,
   { Common }
   Common.uConsts;
 
 function CutStr(var Value: String; CutCount: Integer): Boolean; inline; overload;
 function CutStr(var Value: WideString; CutCount: Integer): Boolean; inline; overload;
 function ExeDir: String;
+function OEMToUnicode(const Source: TArray<Byte>; Length: Integer): String;
 
 implementation
 
@@ -64,6 +65,36 @@ end;
 function ExeDir: String;
 begin
   Result := ExtractFileDir(ParamStr(0));
+end;
+
+function OEMToUnicode(const Source: TArray<Byte>; Length: Integer): String; overload;
+var
+  BuffA: AnsiChar;
+  BuffW: String;
+  i: Integer;
+begin
+
+  Result := '';
+  SetLength(BuffW, 1);
+
+  for i := 0 to Length - 1 do
+  begin
+
+    if Source[i] = 0 then
+      Break;
+
+    if Ord(Source[i]) >= 32 then
+    begin
+
+      BuffA := AnsiChar(Source[i]);
+      OemToCharBuff(PAnsiChar(BuffA), @BuffW[1], 1);
+      Result := Result + BuffW;
+
+    end
+    else Result := Result + Char(Source[i]);
+
+  end;
+
 end;
 
 end.

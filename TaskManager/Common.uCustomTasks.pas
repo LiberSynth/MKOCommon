@@ -17,6 +17,7 @@ type
     function GetCaption: WideString; virtual; safecall; abstract;
     function GetDescription: WideString; virtual; safecall; abstract;
     function GetParamsHelpText: WideString; virtual; safecall; abstract;
+    function GetDirectOutput: LongBool; virtual; safecall;
     function ValidateParams(const _Params: IMKOTaskParams): LongBool; virtual; safecall; abstract;
     function StartTask(const _Params: IMKOTaskParams): IMKOTaskInstance; virtual; safecall; abstract;
 
@@ -37,7 +38,8 @@ type
     procedure Terminate; virtual; safecall;
 
     procedure Init(const _OutputIntf: IMKOTaskOutput); virtual;
-    procedure WriteOut(const _Value: WideString; _Progress: ShortInt);
+    procedure WriteOut(const _Value: WideString; _SeparateLine: LongBool);
+    procedure Progress(_Value: ShortInt);
 
     property Terminated: Boolean read FTerminated;
     property Params: IMKOTaskParams read FParams;
@@ -69,15 +71,27 @@ begin
   FOutputIntf := _OutputIntf;
 end;
 
+procedure TCustomMKOTaskInstance.Progress(_Value: ShortInt);
+begin
+
+end;
+
 procedure TCustomMKOTaskInstance.Terminate;
 begin
   FTerminated := True;
 end;
 
-procedure TCustomMKOTaskInstance.WriteOut(const _Value: WideString; _Progress: ShortInt);
+procedure TCustomMKOTaskInstance.WriteOut(const _Value: WideString; _SeparateLine: LongBool);
 begin
   if not Terminated then
-    OutputIntf.WriteOut(_Value, _Progress);
+    OutputIntf.WriteOut(_Value, _SeparateLine);
+end;
+
+{ TCustomTask }
+
+function TCustomTask.GetDirectOutput: LongBool;
+begin
+  Result := False;
 end;
 
 end.
